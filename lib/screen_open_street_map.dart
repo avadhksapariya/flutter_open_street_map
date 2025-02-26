@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 
@@ -13,9 +17,12 @@ class ScreenOpenStreetMap extends StatefulWidget {
 
 class _ScreenOpenStreetMapState extends State<ScreenOpenStreetMap> {
   final MapController mapController = MapController();
+  final TextEditingController locationController = TextEditingController();
   final Location location = Location();
   bool isLoading = true;
   LatLng? currentLocation;
+  LatLng? destination;
+  List<LatLng> route = [];
 
   @override
   void initState() {
@@ -112,5 +119,42 @@ class _ScreenOpenStreetMapState extends State<ScreenOpenStreetMap> {
       }
     }
     return true;
+  }
+
+  Future<void> getCordinates(String location) async {
+    const String tag = 'get_osm_cordinates';
+
+    final url = Uri.parse("https://nominatim.openstreetmap.org/search?q=$location&format=json&limit=1");
+    log('$tag URL: GET: $url');
+
+    try {
+      final response = await http.get(url);
+      log('$tag response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data != null) {
+          final lat = double.parse(data[0]['lat']);
+          final lon = double.parse(data[0]['lon']);
+
+          setState(() {
+            destination = LatLng(lat, lon);
+          });
+          // await fetchRoute();
+          // method to fetch the route between current location and the destination using OSRM api.
+        } else {
+          errorMessage('Location not found, please try another search.');
+        }
+      } else {
+        errorMessage('Failed to fetch location, Try again later.');
+      }
+    } catch (error) {
+      log('$tag error: ${error.toString()}');
+      return;
+    }
+  }
+
+  void errorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 }
