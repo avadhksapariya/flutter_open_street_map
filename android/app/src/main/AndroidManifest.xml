@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="flutter_open_street_map"
+        android:label="Flutter Open Street Map"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.flutter_open_street_map"
+    namespace = "com.apexavadh.flutter_open_street_map"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
